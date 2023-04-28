@@ -64,8 +64,8 @@ Data :
     ID = Site ID
     Age = Age of site in years after death
     Soil_CFU = Concentration of spores in the soil
-    Grass_CFU_above = Concentration of spores in the aboveground grass component ()
-    Grass_Top_CFU = Concentration of spores in the top grass component ()
+    Grass_CFU_above = Concentration of spores in the aboveground grass component (everything above the roots)
+    Grass_Top_CFU = Concentration of spores in the top grass component (removing the base of the plant which can collect soil)
     Season = Season of death
  
  Location_CFU.csv : Coordinate of each spore concentration site, and NDVI of the sites. The columns are:
