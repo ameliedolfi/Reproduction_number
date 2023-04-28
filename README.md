@@ -3,6 +3,7 @@ Files to run model from the manuscript "Season of death, pathogen persistence an
 
 Scripts:
   R_estimation_Code.R : Run the simulation model
+  
   Plots_R_estimation_Code.R : Code to run the plots found in the MS
   
 Data :
