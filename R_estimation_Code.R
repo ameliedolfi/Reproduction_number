@@ -13,7 +13,7 @@ lapply(c('ggplot2','ggpubr','tidyverse', 'dplyr', 'doParallel', 'purrr',
 
 
 ## Directory
-wd <- 'C:/Users/Amelie/OneDrive - UW-Madison/Documents/PhDUW/PhD/Github/Reproduction_number'
+wd <- 'Github/Reproduction_number'
 setwd(wd)
 set.seed(52)
 
@@ -773,12 +773,11 @@ LD7 <- LD_prediction(Zebra_average, Wildebeest_average, ZebraD_wetP, WildebeestD
 LD8 <- LD_prediction(Zebra_average, Wildebeest_average, ZebraD_wetP, WildebeestD_wetP, LD_test =  10^8, timeline = 100, sim = 100, Drought = 0)
 
 
-## ISSUE HERE
 LDF <- rbind(LD5, LD6, LD7, LD8)
 LDF[,seq(1,12)] <- apply(LDF[,seq(1,12)], 2, function(x) as.numeric(as.character(x)))
 
 LDF$CarcTot <- rowSums(LDF[,seq(2,12)])
 
-#write.csv(LDF, 'Final_data/LDF.csv')
+write.csv(LDF, '/LDF.csv')
 
 ### Then move to plot code for plots 
