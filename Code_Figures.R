@@ -5,7 +5,7 @@
 
 
 ## Directory
-wd <- 'C:/Users/Amelie/OneDrive - UW-Madison/Documents/PhDUW/PhD/Github/Reproduction_number'
+wd <- 'Github/Reproduction_number'
 setwd(wd)
 
 
