@@ -77,4 +77,8 @@ Data :
    NDVI_CDry = NDVI of the site at death during the Cool-dry season
    NDVI_HDry = NDVI of the site at death during the Hot_dry season
 
-
+  Camera_work_time : Numbers of days of recording per camera trap. The columns are:
+    ID: Site ID
+    Month: Year-Month of the recording
+    Carcass : Number of days of recording for the carcass camera
+    Control : Number of days of recording for the control camera
