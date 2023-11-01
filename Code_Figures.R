@@ -1,8 +1,8 @@
 #### FINAL PLOT MS_ R ####
 
 # @author :  Amélie Dolfi
-# @ Date 2/2/2023
-
+# @Date 2/2/2023
+# @Update 11/1/2023
 
 ## Directory
 wd <- 'Github/Reproduction_number'
@@ -526,15 +526,57 @@ dev.off()
 
 
 
-
 ###### SUPPLEMENTARY FIGURES ######
 
 ### Plot S1 ####
 
-
-
-
 ### Plot S2 ####
+
+Cameras <- read.csv('Camera_work_time.csv')
+Cameras <- Cameras %>% separate(Month, c('Month', 'Year'))
+
+Cameras$NumMonth <- ifelse(Cameras$Month %in% c('Apr','Jun','Sep','Nov'), 30,
+                           ifelse(Cameras$Month == 'Feb', 28, 31))
+Cameras[Cameras$Month == 'Feb' & Cameras$Year==12,'NumMonth'] <- 29
+
+Cameras$Missing_carcass <- Cameras$NumMonth - Cameras$Carcass
+Cameras$Missing_control <- Cameras$NumMonth - Cameras$Control
+
+# Cameras$Missing_pairs <- apply(Cameras[,c(7,8)], 1, FUN = max)
+# Cameras$Missing_pairs <- round(Cameras$Missing_pairs)
+
+Cameras_F <- data.frame(Missing = c(Cameras$Missing_carcass, Cameras$Missing_control))
+
+
+PlotS2 <- ggplot(Cameras_F, aes(x=Missing))+
+  geom_histogram(color = 'black', fill = 'grey', binwidth = 1)+
+  ylab('Number of months')+
+  xlab('Days of missing data')+
+  scale_x_continuous(breaks = seq(0,11), labels = seq(0,11))+
+  scale_y_continuous(breaks = seq(0,215,5), labels = c(0,'','','','',25,'','','','',50, '','','','',75, '','','','',100,
+                                                       '','','','',125,  '','','','',150,  '','','','',175,  '','','','',200,
+                                                       '','',''))+
+  theme_pubclean()+
+  theme(axis.title = element_text(size=8),
+        axis.text = element_text(size=6, color='black'),
+        legend.title = element_text(size=8),
+        legend.key.size = unit(0.25, "cm"),
+        axis.ticks.y = element_line(linewidth = 0.2),
+        axis.line = element_line(color = 'black',linewidth = 0.2),
+        legend.text = element_text(size=6, color='black'),
+        strip.background = element_rect(colour="black",fill="white"),
+        panel.grid.major.y = element_line(linewidth = 0.1),
+        strip.text = element_text(size = 8),
+        title = element_text(size = 6))
+
+
+tiff("Figures/FigureS2.tif",
+     compression = "lzw",width=12,height=7,units="cm",res=200)
+plot(PlotS2)
+dev.off()
+
+
+### Plot S3 ####
 
 
 ### ZEBRA
@@ -620,7 +662,7 @@ pdf_NG_Z$Season <- factor(pdf_NG_Z$Season, levels =c('Hot_wet', 'Cool_dry','Hot_
 pdf_NG_Z$Dist <- factor(pdf_NG_Z$Dist, levels =c('0-4km', '4-8km','+8km'))
 
 
-PlotS2AF <- ggplot(subset(pdf_NG_Z, Age == 'A' & Sex == 'F'), aes(x= Visit, y= Density, col = Year))+
+PlotS3AF <- ggplot(subset(pdf_NG_Z, Age == 'A' & Sex == 'F'), aes(x= Visit, y= Density, col = Year))+
   facet_grid(Dist ~ Season) +
   geom_line()+
   xlab('Number of visits')+
@@ -641,7 +683,7 @@ PlotS2AF <- ggplot(subset(pdf_NG_Z, Age == 'A' & Sex == 'F'), aes(x= Visit, y= D
         title = element_text(size = 10))+
   ggtitle('Adult Female')
 
-PlotS2AM <- ggplot(subset(pdf_NG_Z, Age == 'A' & Sex == 'M'), aes(x= Visit, y= Density, col = Year))+
+PlotS3AM <- ggplot(subset(pdf_NG_Z, Age == 'A' & Sex == 'M'), aes(x= Visit, y= Density, col = Year))+
   facet_grid(Dist ~ Season) +
   geom_line()+
   xlab('Number of visits')+
@@ -662,7 +704,7 @@ PlotS2AM <- ggplot(subset(pdf_NG_Z, Age == 'A' & Sex == 'M'), aes(x= Visit, y= D
         title = element_text(size = 10))+
   ggtitle('Adult Male')
 
-PlotS2SAF <- ggplot(subset(pdf_NG_Z, Age == 'SA' & Sex == 'F'), aes(x= Visit, y= Density, col = Year))+
+PlotS3SAF <- ggplot(subset(pdf_NG_Z, Age == 'SA' & Sex == 'F'), aes(x= Visit, y= Density, col = Year))+
   facet_grid(Dist ~ Season) +
   geom_line()+
   xlab('Number of visits')+
@@ -684,127 +726,11 @@ PlotS2SAF <- ggplot(subset(pdf_NG_Z, Age == 'SA' & Sex == 'F'), aes(x= Visit, y=
   ggtitle('Sub-Adult Female')
 
 
-PlotS2SAM <- ggplot(subset(pdf_NG_Z, Age == 'SA' & Sex == 'M'), aes(x= Visit, y= Density, col = Year))+
+PlotS3SAM <- ggplot(subset(pdf_NG_Z, Age == 'SA' & Sex == 'M'), aes(x= Visit, y= Density, col = Year))+
   facet_grid(Dist ~ Season) +
   geom_line()+
   xlab('Number of visits')+
   scale_x_continuous(breaks = seq(0,120,20), labels = seq(0,120,20))+
-  scale_color_manual(values = c('burlywood3', 'springgreen3', 'slateblue3'))+
-  theme_pubclean()+
-  theme(axis.title = element_text(size=10),
-        axis.text = element_text(size=8, color='black'),
-        legend.title = element_text(size=10),
-        legend.key.size = unit(0.5, "cm"),
-        axis.ticks.y = element_blank(),
-        legend.text = element_text(size=10, color='black'),
-        axis.line = element_line(color = 'black',linewidth = 0.2),
-        panel.grid.major.y = element_line(linewidth = 0.1),
-        panel.border = element_rect(colour = "black", fill=NA, size=0.1),
-        strip.background = element_rect(colour="black",fill="white"),
-        strip.text = element_text(size = 10),
-        title = element_text(size = 10))+
-  ggtitle('Sub-Adult Male')
-
-
-PlotS2 <- ggarrange(PlotS2AF, PlotS2AM, PlotS2SAF, PlotS2SAM, ncol = 2, nrow = 2, common.legend = T)
-
-tiff("Final_figures/FigureS2.tif",
-     compression = "lzw",width=25,height=18,units="cm",res=200)
-
-plot(PlotS2)
-dev.off()
-
-#### Plot S3 ###
-
-pdf_NG_W <- data.frame(Visits = numeric(), Density = numeric(),
-                       Year = character(), Season = character(),
-                       Dist = character(), Age = character(), Sex = character())
-
-for (Ag in c('A','SA')){
-  for (Se in c('F','M')){
-    for (Sea in c('Hot_wet','Cool_dry','Hot_dry')){
-      for (Dist in c('0-3km','3-6km','+6km')){
-        
-        pdf <- plot_PDF_NV(Average_NV_W, Ag, Se , Sea, Dist)
-        pdf_NG_W <- rbind(pdf_NG_W, pdf)
-      }
-    }
-  }
-}
-
-pdf_NG_W$Season <- factor(pdf_NG_W$Season, levels =c('Hot_wet', 'Cool_dry','Hot_dry'))
-pdf_NG_W$Dist <- factor(pdf_NG_W$Dist, levels =c('0-3km', '3-6km','+6km'))
-
-
-PlotS3AF <- ggplot(subset(pdf_NG_W, Age == 'A' & Sex == 'F'), aes(x= Visit, y= Density, col = Year))+
-  facet_grid(Dist ~ Season) +
-  geom_line()+
-  xlab('Number of visits')+
-  scale_x_continuous(breaks = seq(0,60,20), labels = seq(0,60,20))+
-  scale_color_manual(values = c('burlywood3', 'springgreen3', 'slateblue3'))+
-  theme_pubclean()+
-  theme(axis.title = element_text(size=10),
-        axis.text = element_text(size=8, color='black'),
-        legend.title = element_text(size=10),
-        legend.key.size = unit(0.5, "cm"),
-        axis.ticks.y = element_blank(),
-        legend.text = element_text(size=10, color='black'),
-        axis.line = element_line(color = 'black',linewidth = 0.2),
-        panel.grid.major.y = element_line(linewidth = 0.1),
-        panel.border = element_rect(colour = "black", fill=NA, size=0.1),
-        strip.background = element_rect(colour="black",fill="white"),
-        strip.text = element_text(size = 10),
-        title = element_text(size = 10))+
-  ggtitle('Adult Female')
-
-PlotS3AM <- ggplot(subset(pdf_NG_W, Age == 'A' & Sex == 'M'), aes(x= Visit, y= Density, col = Year))+
-  facet_grid(Dist ~ Season) +
-  geom_line()+
-  xlab('Number of visits')+
-  scale_x_continuous(breaks = seq(0,60,20), labels = seq(0,60,20))+
-  scale_color_manual(values = c('burlywood3', 'springgreen3', 'slateblue3'))+
-  theme_pubclean()+
-  theme(axis.title = element_text(size=10),
-        axis.text = element_text(size=8, color='black'),
-        legend.title = element_text(size=10),
-        legend.key.size = unit(0.5, "cm"),
-        axis.ticks.y = element_blank(),
-        legend.text = element_text(size=10, color='black'),
-        axis.line = element_line(color = 'black',linewidth = 0.2),
-        panel.grid.major.y = element_line(linewidth = 0.1),
-        panel.border = element_rect(colour = "black", fill=NA, size=0.1),
-        strip.background = element_rect(colour="black",fill="white"),
-        strip.text = element_text(size = 10),
-        title = element_text(size = 10))+
-  ggtitle('Adult Male')
-
-PlotS3SAF <- ggplot(subset(pdf_NG_W, Age == 'SA' & Sex == 'F'), aes(x= Visit, y= Density, col = Year))+
-  facet_grid(Dist ~ Season) +
-  geom_line()+
-  xlab('Number of visits')+
-  scale_x_continuous(breaks = seq(0,60,20), labels = seq(0,60,20))+
-  scale_color_manual(values = c('burlywood3', 'springgreen3', 'slateblue3'))+
-  theme_pubclean()+
-  theme(axis.title = element_text(size=10),
-        axis.text = element_text(size=8, color='black'),
-        legend.title = element_text(size=10),
-        legend.key.size = unit(0.5, "cm"),
-        axis.ticks.y = element_blank(),
-        legend.text = element_text(size=10, color='black'),
-        axis.line = element_line(color = 'black',linewidth = 0.2),
-        panel.grid.major.y = element_line(linewidth = 0.1),
-        panel.border = element_rect(colour = "black", fill=NA, size=0.1),
-        strip.background = element_rect(colour="black",fill="white"),
-        strip.text = element_text(size = 10),
-        title = element_text(size = 10))+
-  ggtitle('Sub-Adult Female')
-
-
-PlotS3SAM <- ggplot(subset(pdf_NG_W, Age == 'SA' & Sex == 'M'), aes(x= Visit, y= Density, col = Year))+
-  facet_grid(Dist ~ Season) +
-  geom_line()+
-  xlab('Number of visits')+
-  scale_x_continuous(breaks = seq(0,60,20), labels = seq(0,60,20))+
   scale_color_manual(values = c('burlywood3', 'springgreen3', 'slateblue3'))+
   theme_pubclean()+
   theme(axis.title = element_text(size=10),
@@ -830,8 +756,124 @@ tiff("Final_figures/FigureS3.tif",
 plot(PlotS3)
 dev.off()
 
+#### Plot S4 ###
 
-### Plot S4 ####
+pdf_NG_W <- data.frame(Visits = numeric(), Density = numeric(),
+                       Year = character(), Season = character(),
+                       Dist = character(), Age = character(), Sex = character())
+
+for (Ag in c('A','SA')){
+  for (Se in c('F','M')){
+    for (Sea in c('Hot_wet','Cool_dry','Hot_dry')){
+      for (Dist in c('0-3km','3-6km','+6km')){
+        
+        pdf <- plot_PDF_NV(Average_NV_W, Ag, Se , Sea, Dist)
+        pdf_NG_W <- rbind(pdf_NG_W, pdf)
+      }
+    }
+  }
+}
+
+pdf_NG_W$Season <- factor(pdf_NG_W$Season, levels =c('Hot_wet', 'Cool_dry','Hot_dry'))
+pdf_NG_W$Dist <- factor(pdf_NG_W$Dist, levels =c('0-3km', '3-6km','+6km'))
+
+
+PlotS4AF <- ggplot(subset(pdf_NG_W, Age == 'A' & Sex == 'F'), aes(x= Visit, y= Density, col = Year))+
+  facet_grid(Dist ~ Season) +
+  geom_line()+
+  xlab('Number of visits')+
+  scale_x_continuous(breaks = seq(0,60,20), labels = seq(0,60,20))+
+  scale_color_manual(values = c('burlywood3', 'springgreen3', 'slateblue3'))+
+  theme_pubclean()+
+  theme(axis.title = element_text(size=10),
+        axis.text = element_text(size=8, color='black'),
+        legend.title = element_text(size=10),
+        legend.key.size = unit(0.5, "cm"),
+        axis.ticks.y = element_blank(),
+        legend.text = element_text(size=10, color='black'),
+        axis.line = element_line(color = 'black',linewidth = 0.2),
+        panel.grid.major.y = element_line(linewidth = 0.1),
+        panel.border = element_rect(colour = "black", fill=NA, size=0.1),
+        strip.background = element_rect(colour="black",fill="white"),
+        strip.text = element_text(size = 10),
+        title = element_text(size = 10))+
+  ggtitle('Adult Female')
+
+PlotS4AM <- ggplot(subset(pdf_NG_W, Age == 'A' & Sex == 'M'), aes(x= Visit, y= Density, col = Year))+
+  facet_grid(Dist ~ Season) +
+  geom_line()+
+  xlab('Number of visits')+
+  scale_x_continuous(breaks = seq(0,60,20), labels = seq(0,60,20))+
+  scale_color_manual(values = c('burlywood3', 'springgreen3', 'slateblue3'))+
+  theme_pubclean()+
+  theme(axis.title = element_text(size=10),
+        axis.text = element_text(size=8, color='black'),
+        legend.title = element_text(size=10),
+        legend.key.size = unit(0.5, "cm"),
+        axis.ticks.y = element_blank(),
+        legend.text = element_text(size=10, color='black'),
+        axis.line = element_line(color = 'black',linewidth = 0.2),
+        panel.grid.major.y = element_line(linewidth = 0.1),
+        panel.border = element_rect(colour = "black", fill=NA, size=0.1),
+        strip.background = element_rect(colour="black",fill="white"),
+        strip.text = element_text(size = 10),
+        title = element_text(size = 10))+
+  ggtitle('Adult Male')
+
+PlotS4SAF <- ggplot(subset(pdf_NG_W, Age == 'SA' & Sex == 'F'), aes(x= Visit, y= Density, col = Year))+
+  facet_grid(Dist ~ Season) +
+  geom_line()+
+  xlab('Number of visits')+
+  scale_x_continuous(breaks = seq(0,60,20), labels = seq(0,60,20))+
+  scale_color_manual(values = c('burlywood3', 'springgreen3', 'slateblue3'))+
+  theme_pubclean()+
+  theme(axis.title = element_text(size=10),
+        axis.text = element_text(size=8, color='black'),
+        legend.title = element_text(size=10),
+        legend.key.size = unit(0.5, "cm"),
+        axis.ticks.y = element_blank(),
+        legend.text = element_text(size=10, color='black'),
+        axis.line = element_line(color = 'black',linewidth = 0.2),
+        panel.grid.major.y = element_line(linewidth = 0.1),
+        panel.border = element_rect(colour = "black", fill=NA, size=0.1),
+        strip.background = element_rect(colour="black",fill="white"),
+        strip.text = element_text(size = 10),
+        title = element_text(size = 10))+
+  ggtitle('Sub-Adult Female')
+
+
+PlotS4SAM <- ggplot(subset(pdf_NG_W, Age == 'SA' & Sex == 'M'), aes(x= Visit, y= Density, col = Year))+
+  facet_grid(Dist ~ Season) +
+  geom_line()+
+  xlab('Number of visits')+
+  scale_x_continuous(breaks = seq(0,60,20), labels = seq(0,60,20))+
+  scale_color_manual(values = c('burlywood3', 'springgreen3', 'slateblue3'))+
+  theme_pubclean()+
+  theme(axis.title = element_text(size=10),
+        axis.text = element_text(size=8, color='black'),
+        legend.title = element_text(size=10),
+        legend.key.size = unit(0.5, "cm"),
+        axis.ticks.y = element_blank(),
+        legend.text = element_text(size=10, color='black'),
+        axis.line = element_line(color = 'black',linewidth = 0.2),
+        panel.grid.major.y = element_line(linewidth = 0.1),
+        panel.border = element_rect(colour = "black", fill=NA, size=0.1),
+        strip.background = element_rect(colour="black",fill="white"),
+        strip.text = element_text(size = 10),
+        title = element_text(size = 10))+
+  ggtitle('Sub-Adult Male')
+
+
+PlotS4 <- ggarrange(PlotS4AF, PlotS4AM, PlotS4SAF, PlotS4SAM, ncol = 2, nrow = 2, common.legend = T)
+
+tiff("Final_figures/FigureS4.tif",
+     compression = "lzw",width=25,height=18,units="cm",res=200)
+
+plot(PlotS4)
+dev.off()
+
+
+### Plot S5 ####
 
 ### NG PDF
 plot_PDF_NG <- function(data, Ag, Se){
@@ -863,45 +905,7 @@ pdf_NG$Sex <- ifelse(pdf_NG$Sex == 'F', 'Female','Male')
 pdf_NG$Age <- ifelse(pdf_NG$Age == 'A', 'Adult','Sub-Adult')
 
 
-PlotS4 <- ggplot(pdf_NG, aes(x= Grazing, y= Density, col = Year))+
-  facet_grid(Age ~ Sex) +
-  geom_line()+
-  xlab('Probability of grazing')+
-  scale_x_continuous(breaks = seq(0,1,0.2), labels = seq(0,1,0.2))+
-  scale_color_manual(values = c('burlywood3', 'springgreen3', 'slateblue3'))+
-  theme_pubclean()+
-  theme(axis.title = element_text(size=10),
-        axis.text = element_text(size=8, color='black'),
-        legend.title = element_text(size=10),
-        legend.key.size = unit(0.5, "cm"),
-        axis.ticks.y = element_blank(),
-        legend.text = element_text(size=10, color='black'),
-        axis.line = element_line(color = 'black',linewidth = 0.2),
-        panel.grid.major.y = element_line(linewidth = 0.1),
-        panel.border = element_rect(colour = "black", fill=NA, size=0.1),
-        strip.background = element_rect(colour="black",fill="white"),
-        strip.text = element_text(size = 10),
-        title = element_text(size = 10))
-
-tiff("Final_figures/FigureS4.tif",
-     compression = "lzw",width=18,height=12,units="cm",res=200)
-
-plot(PlotS4)
-dev.off()
-
-
-#### Plot S5 ###
-
-pdf_NG_AF_W <- plot_PDF_NG(PGV_W, 'A','F')
-pdf_NG_AM_W <- plot_PDF_NG(PGV_W, 'A','M')
-pdf_NG_SAF_W <- plot_PDF_NG(PGV_W, 'SA','F')
-pdf_NG_SAM_W <- plot_PDF_NG(PGV_W, 'SA','M')
-
-pdf_NG_W <- rbind(pdf_NG_AF_W, pdf_NG_AM_W, pdf_NG_SAF_W, pdf_NG_SAM_W)
-pdf_NG_W$Sex <- ifelse(pdf_NG_W$Sex == 'F', 'Female','Male')
-pdf_NG_W$Age <- ifelse(pdf_NG_W$Age == 'A', 'Adult','Sub-Adult')
-
-PlotS5 <- ggplot(pdf_NG_W, aes(x= Grazing, y= Density, col = Year))+
+PlotS5 <- ggplot(pdf_NG, aes(x= Grazing, y= Density, col = Year))+
   facet_grid(Age ~ Sex) +
   geom_line()+
   xlab('Probability of grazing')+
@@ -928,27 +932,23 @@ plot(PlotS5)
 dev.off()
 
 
-##### Plot S6 ###
-## TG PDF
+#### Plot S6 ###
 
-pdf_TG_HW <- density(log10(subset(IndG_demo_Z, Season == 'Hot_wet')$TG +1), from=0, bw=0.05)
-pdf_TG_CD <- density(log10(subset(IndG_demo_Z, Season == 'Cool_dry')$TG +1), from=0, bw=0.05)
-pdf_TG_HD <- density(log10(subset(IndG_demo_Z, Season == 'Hot_dry')$TG +1), from=0, bw=0.05)
+pdf_NG_AF_W <- plot_PDF_NG(PGV_W, 'A','F')
+pdf_NG_AM_W <- plot_PDF_NG(PGV_W, 'A','M')
+pdf_NG_SAF_W <- plot_PDF_NG(PGV_W, 'SA','F')
+pdf_NG_SAM_W <- plot_PDF_NG(PGV_W, 'SA','M')
 
-pdf_TG <- data.frame(TG = c(pdf_TG_HW$x, pdf_TG_CD$x, pdf_TG_HD$x),
-                     Density = c(pdf_TG_HW$y, pdf_TG_CD$y, pdf_TG_HD$y),
-                     Season = c(rep('Hot_wet', length(pdf_TG_HW$x)),
-                                rep('Cool_dry', length(pdf_TG_CD$x)),
-                                rep('Hot_dry', length(pdf_TG_HD$x))))
+pdf_NG_W <- rbind(pdf_NG_AF_W, pdf_NG_AM_W, pdf_NG_SAF_W, pdf_NG_SAM_W)
+pdf_NG_W$Sex <- ifelse(pdf_NG_W$Sex == 'F', 'Female','Male')
+pdf_NG_W$Age <- ifelse(pdf_NG_W$Age == 'A', 'Adult','Sub-Adult')
 
-pdf_TG$Season <- factor(pdf_TG$Season, levels = c('Hot_wet','Cool_dry','Hot_dry'))
-
-
-PlotS6 <- ggplot(pdf_TG, aes(x= 10^TG - 1, y= Density, col = Season))+
+PlotS6 <- ggplot(pdf_NG_W, aes(x= Grazing, y= Density, col = Year))+
+  facet_grid(Age ~ Sex) +
   geom_line()+
-  xlab('Time spent grazing (s)')+
-  scale_x_continuous(breaks = seq(0,600,50), labels = seq(0,600,50))+
-  scale_color_manual(values = c('blue3', 'orange2', 'red3'))+
+  xlab('Probability of grazing')+
+  scale_x_continuous(breaks = seq(0,1,0.2), labels = seq(0,1,0.2))+
+  scale_color_manual(values = c('burlywood3', 'springgreen3', 'slateblue3'))+
   theme_pubclean()+
   theme(axis.title = element_text(size=10),
         axis.text = element_text(size=8, color='black'),
@@ -969,21 +969,24 @@ tiff("Final_figures/FigureS6.tif",
 plot(PlotS6)
 dev.off()
 
-### Plot S7 ####
 
-pdf_TG_HW_W <- density(log10(subset(IndG_demo_W, Season == 'Hot_wet')$TG +1), from=0, bw=0.05)
-pdf_TG_CD_W <- density(log10(subset(IndG_demo_W, Season == 'Cool_dry')$TG +1), from=0, bw=0.05)
-pdf_TG_HD_W <- density(log10(subset(IndG_demo_W, Season == 'Hot_dry')$TG +1), from=0, bw=0.05)
+##### Plot S7 ###
+## TG PDF
 
-pdf_TG_W <- data.frame(TG = c(pdf_TG_HW_W$x, pdf_TG_CD_W$x, pdf_TG_HD_W$x),
-                       Density = c(pdf_TG_HW_W$y, pdf_TG_CD_W$y, pdf_TG_HD_W$y),
-                       Season = c(rep('Hot_wet', length(pdf_TG_HW_W$x)),
-                                  rep('Cool_dry', length(pdf_TG_CD_W$x)),
-                                  rep('Hot_dry', length(pdf_TG_HD_W$x))))
+pdf_TG_HW <- density(log10(subset(IndG_demo_Z, Season == 'Hot_wet')$TG +1), from=0, bw=0.05)
+pdf_TG_CD <- density(log10(subset(IndG_demo_Z, Season == 'Cool_dry')$TG +1), from=0, bw=0.05)
+pdf_TG_HD <- density(log10(subset(IndG_demo_Z, Season == 'Hot_dry')$TG +1), from=0, bw=0.05)
 
-pdf_TG_W$Season <- factor(pdf_TG_W$Season, levels = c('Hot_wet','Cool_dry','Hot_dry'))
+pdf_TG <- data.frame(TG = c(pdf_TG_HW$x, pdf_TG_CD$x, pdf_TG_HD$x),
+                     Density = c(pdf_TG_HW$y, pdf_TG_CD$y, pdf_TG_HD$y),
+                     Season = c(rep('Hot_wet', length(pdf_TG_HW$x)),
+                                rep('Cool_dry', length(pdf_TG_CD$x)),
+                                rep('Hot_dry', length(pdf_TG_HD$x))))
 
-PlotS7 <- ggplot(pdf_TG_W, aes(x= 10^TG - 1, y= Density, col = Season))+
+pdf_TG$Season <- factor(pdf_TG$Season, levels = c('Hot_wet','Cool_dry','Hot_dry'))
+
+
+PlotS7 <- ggplot(pdf_TG, aes(x= 10^TG - 1, y= Density, col = Season))+
   geom_line()+
   xlab('Time spent grazing (s)')+
   scale_x_continuous(breaks = seq(0,600,50), labels = seq(0,600,50))+
@@ -1004,43 +1007,60 @@ PlotS7 <- ggplot(pdf_TG_W, aes(x= 10^TG - 1, y= Density, col = Season))+
 
 tiff("Final_figures/FigureS7.tif",
      compression = "lzw",width=18,height=12,units="cm",res=200)
+
 plot(PlotS7)
 dev.off()
 
-#### Plot S8 ####
+### Plot S8 ####
 
+pdf_TG_HW_W <- density(log10(subset(IndG_demo_W, Season == 'Hot_wet')$TG +1), from=0, bw=0.05)
+pdf_TG_CD_W <- density(log10(subset(IndG_demo_W, Season == 'Cool_dry')$TG +1), from=0, bw=0.05)
+pdf_TG_HD_W <- density(log10(subset(IndG_demo_W, Season == 'Hot_dry')$TG +1), from=0, bw=0.05)
 
-plotS8b <- plot_fig4(data = subset(Zebra_average_RO , LD == 10^5), tit = expression('b) LD = 10'^5), lims = c(0,100))
-plotS8c <- plot_fig4(data = subset(Zebra_average_RO , LD == 10^6), tit =  expression('c) LD = 10'^6), lims = c(0,100))
-plotS8d <- plot_fig4(data = subset(Zebra_average_RO , LD == 10^7), tit = expression('d) LD = 10'^7), lims = c(0,100))
-plotS8e <- plot_fig4(data = subset(Zebra_average_RO , LD == 10^8), tit = expression('e) LD = 10'^8), lims = c(0,100))
+pdf_TG_W <- data.frame(TG = c(pdf_TG_HW_W$x, pdf_TG_CD_W$x, pdf_TG_HD_W$x),
+                       Density = c(pdf_TG_HW_W$y, pdf_TG_CD_W$y, pdf_TG_HD_W$y),
+                       Season = c(rep('Hot_wet', length(pdf_TG_HW_W$x)),
+                                  rep('Cool_dry', length(pdf_TG_CD_W$x)),
+                                  rep('Hot_dry', length(pdf_TG_HD_W$x))))
 
-PlotS8 <- ggarrange(Plot_Reading_key, plotS8b, plotS8c, ggplot()+theme_pubclean(), plotS8d, plotS8e, common.legend = T, ncol = 3, nrow = 2)
-PlotS8 <- PlotS8 + annotate("text", x = 0.5, y = 0.018, size = 3,  label = "Percentage of animals ingesting soil in the wet season") 
-PlotS8 <- PlotS8 + annotate("text", x = 0.01, y = 0.5, size = 3, angle = 90, label = "Percentage of animals ingesting soil in the dry season") 
-PlotS8 <- PlotS8 + inset_element(p = Zeb_pic, left = 0.9, bottom = 0.9, right = 0.99,  top = 0.99)
+pdf_TG_W$Season <- factor(pdf_TG_W$Season, levels = c('Hot_wet','Cool_dry','Hot_dry'))
+
+PlotS8 <- ggplot(pdf_TG_W, aes(x= 10^TG - 1, y= Density, col = Season))+
+  geom_line()+
+  xlab('Time spent grazing (s)')+
+  scale_x_continuous(breaks = seq(0,600,50), labels = seq(0,600,50))+
+  scale_color_manual(values = c('blue3', 'orange2', 'red3'))+
+  theme_pubclean()+
+  theme(axis.title = element_text(size=10),
+        axis.text = element_text(size=8, color='black'),
+        legend.title = element_text(size=10),
+        legend.key.size = unit(0.5, "cm"),
+        axis.ticks.y = element_blank(),
+        legend.text = element_text(size=10, color='black'),
+        axis.line = element_line(color = 'black',linewidth = 0.2),
+        panel.grid.major.y = element_line(linewidth = 0.1),
+        panel.border = element_rect(colour = "black", fill=NA, size=0.1),
+        strip.background = element_rect(colour="black",fill="white"),
+        strip.text = element_text(size = 10),
+        title = element_text(size = 10))
 
 tiff("Final_figures/FigureS8.tif",
-     compression = "lzw",width=18, height=11, units="cm",res=200)
+     compression = "lzw",width=18,height=12,units="cm",res=200)
 plot(PlotS8)
 dev.off()
 
+#### Plot S9 ####
 
-### Plot S9 ####
 
-Wildebeest_average <- read.csv('Final_data/Wildebeest_Final_100.csv')
-Wildebeest_average_R0 <- Data_analysis(Wildebeest_average)
-
-plotS9b <- plot_fig4(data = subset(Wildebeest_average_R0, LD == 10^5), tit = expression('b) LD = 10'^5), lims = c(0,100))
-plotS9c <- plot_fig4(data = subset(Wildebeest_average_R0, LD == 10^6), tit = expression('c) LD = 10'^6), lims = c(0,100))
-plotS9d <- plot_fig4(data = subset(Wildebeest_average_R0, LD == 10^7), tit = expression('d) LD = 10'^7), lims = c(0,100))
-plotS9e <- plot_fig4(data = subset(Wildebeest_average_R0, LD == 10^8), tit = expression('e) LD = 10'^8), lims = c(0,100))
+plotS9b <- plot_fig4(data = subset(Zebra_average_RO , LD == 10^5), tit = expression('b) LD = 10'^5), lims = c(0,100))
+plotS9c <- plot_fig4(data = subset(Zebra_average_RO , LD == 10^6), tit =  expression('c) LD = 10'^6), lims = c(0,100))
+plotS9d <- plot_fig4(data = subset(Zebra_average_RO , LD == 10^7), tit = expression('d) LD = 10'^7), lims = c(0,100))
+plotS9e <- plot_fig4(data = subset(Zebra_average_RO , LD == 10^8), tit = expression('e) LD = 10'^8), lims = c(0,100))
 
 PlotS9 <- ggarrange(Plot_Reading_key, plotS9b, plotS9c, ggplot()+theme_pubclean(), plotS9d, plotS9e, common.legend = T, ncol = 3, nrow = 2)
 PlotS9 <- PlotS9 + annotate("text", x = 0.5, y = 0.018, size = 3,  label = "Percentage of animals ingesting soil in the wet season") 
 PlotS9 <- PlotS9 + annotate("text", x = 0.01, y = 0.5, size = 3, angle = 90, label = "Percentage of animals ingesting soil in the dry season") 
-PlotS9 <- PlotS9 + inset_element(p = Wil_pic, left = 0.9, bottom = 0.9, right = 0.99,  top = 0.99)
-
+PlotS9 <- PlotS9 + inset_element(p = Zeb_pic, left = 0.9, bottom = 0.9, right = 0.99,  top = 0.99)
 
 tiff("Final_figures/FigureS9.tif",
      compression = "lzw",width=18, height=11, units="cm",res=200)
@@ -1048,8 +1068,30 @@ plot(PlotS9)
 dev.off()
 
 
+### Plot S10 ####
 
-#### Plot S10
+Wildebeest_average <- read.csv('Final_data/Wildebeest_Final_100.csv')
+Wildebeest_average_R0 <- Data_analysis(Wildebeest_average)
+
+plotS10b <- plot_fig4(data = subset(Wildebeest_average_R0, LD == 10^5), tit = expression('b) LD = 10'^5), lims = c(0,100))
+plotS10c <- plot_fig4(data = subset(Wildebeest_average_R0, LD == 10^6), tit = expression('c) LD = 10'^6), lims = c(0,100))
+plotS10d <- plot_fig4(data = subset(Wildebeest_average_R0, LD == 10^7), tit = expression('d) LD = 10'^7), lims = c(0,100))
+plotS10e <- plot_fig4(data = subset(Wildebeest_average_R0, LD == 10^8), tit = expression('e) LD = 10'^8), lims = c(0,100))
+
+PlotS10 <- ggarrange(Plot_Reading_key, plotS10b, plotS10c, ggplot()+theme_pubclean(), plotS10d, plotS10e, common.legend = T, ncol = 3, nrow = 2)
+PlotS10 <- PlotS10 + annotate("text", x = 0.5, y = 0.018, size = 3,  label = "Percentage of animals ingesting soil in the wet season") 
+PlotS10 <- PlotS10 + annotate("text", x = 0.01, y = 0.5, size = 3, angle = 90, label = "Percentage of animals ingesting soil in the dry season") 
+PlotS10 <- PlotS10 + inset_element(p = Wil_pic, left = 0.9, bottom = 0.9, right = 0.99,  top = 0.99)
+
+
+tiff("Final_figures/FigureS10.tif",
+     compression = "lzw",width=18, height=11, units="cm",res=200)
+plot(PlotS10)
+dev.off()
+
+
+
+#### Plot S11
 
 
 WildebeestW_dryP <- read.csv('Final_data/Wildebeest__Dry_Pathogen_Wet_visit_100.csv')
@@ -1065,26 +1107,26 @@ WildebeestD_wetP_R0 <- Data_analysis(WildebeestD_wetP)
 
 
 
-plotS10b <- plot_fig4(data = subset(Wildebeest_average_R0, LD == 10^7), tit = 'b) Average rainfall; \n    all infectious sites', lims = c(0,20.5))
-plotS10c <- plot_fig4(data = subset(WildebeestW_wetP_R0, LD == 10^7), tit = 'c) Average rainfall;\n    wet-season formed infectious sites', lims = c(0,20.5))
-plotS10d <- plot_fig4(data = subset(WildebeestW_dryP_R0, LD == 10^7), tit = 'd) Average rainfall;\n    dry-season formed infectious sites', lims = c(0,20.5))
-plotS10e <- plot_fig4(data = subset(WildebeestD_wetP_R0, LD == 10^7), tit = 'e) Simulated Drought;\n    wet-season formed infectious sites', lims = c(0,20.5))
-plotS10f <- plot_fig4(data = subset(WildebeestD_dryP_R0, LD == 10^7), tit = 'f) Simulated Drought;\n    dry-season formed infectious site', lims = c(0,20.5))
+plotS11b <- plot_fig4(data = subset(Wildebeest_average_R0, LD == 10^7), tit = 'b) Average rainfall; \n    all infectious sites', lims = c(0,20.5))
+plotS11c <- plot_fig4(data = subset(WildebeestW_wetP_R0, LD == 10^7), tit = 'c) Average rainfall;\n    wet-season formed infectious sites', lims = c(0,20.5))
+plotS11d <- plot_fig4(data = subset(WildebeestW_dryP_R0, LD == 10^7), tit = 'd) Average rainfall;\n    dry-season formed infectious sites', lims = c(0,20.5))
+plotS11e <- plot_fig4(data = subset(WildebeestD_wetP_R0, LD == 10^7), tit = 'e) Simulated Drought;\n    wet-season formed infectious sites', lims = c(0,20.5))
+plotS11f <- plot_fig4(data = subset(WildebeestD_dryP_R0, LD == 10^7), tit = 'f) Simulated Drought;\n    dry-season formed infectious site', lims = c(0,20.5))
 
 
-PlotS10 <- ggarrange(Plot_Reading_key, plotS10c, plotS10e, plotS10b, plotS10d, plotS10f, common.legend = T, ncol = 3, nrow = 2)
-PlotS10 <- PlotS10 + annotate("text", x = 0.5, y = 0.018, size = 3,  label = "Percentage of animals ingesting soil in the wet season") 
-PlotS10 <- PlotS10 + annotate("text", x = 0.01, y = 0.5, size = 3, angle = 90, label = "Percentage of animals ingesting soil in the dry season") 
-PlotS10 <- PlotS10 + inset_element(p = Wil_pic, left = 0.9, bottom = 0.9, right = 0.99,  top = 0.99)
+PlotS11 <- ggarrange(Plot_Reading_key, plotS11c, plotS11e, plotS11b, plotS11d, plotS11f, common.legend = T, ncol = 3, nrow = 2)
+PlotS11 <- PlotS11 + annotate("text", x = 0.5, y = 0.018, size = 3,  label = "Percentage of animals ingesting soil in the wet season") 
+PlotS11 <- PlotS11 + annotate("text", x = 0.01, y = 0.5, size = 3, angle = 90, label = "Percentage of animals ingesting soil in the dry season") 
+PlotS11 <- PlotS11 + inset_element(p = Wil_pic, left = 0.9, bottom = 0.9, right = 0.99,  top = 0.99)
 
-tiff("Final_figures/FigureS10.tif",
+tiff("Final_figures/FigureS11.tif",
      compression = "lzw",width=18, height=11, units="cm",res=200)
 
-plot(PlotS10)
+plot(PlotS11)
 dev.off()
 
 
-### Plot S11 ####
+### Plot S12 ####
 
 Wildebeest_YDR <- Wildebeest_average %>% group_by(LD, Year, Rep, Distance, Prop, Wwet, Wdry) %>%
   summarise(Infection = sum(Infected, na.rm=T),
@@ -1133,7 +1175,7 @@ Wildebeest_Ymean_space$LD1 <- factor(Wildebeest_Ymean_space$LD1,
 
 
 
-PlotS11 <- ggplot(Wildebeest_Ymean, aes(x=Year, y = Infected, fill = LD1))+
+PlotS12 <- ggplot(Wildebeest_Ymean, aes(x=Year, y = Infected, fill = LD1))+
   geom_bar(position = position_dodge2(), alpha=0.5, stat = 'identity')+
   geom_bar(data=Wildebeest_Ymean_space, position = position_dodge2(), stat = 'identity')+
   geom_errorbar(data=Wildebeest_Ymean_space, aes(x = Year +0.02, ymin = SD_min , ymax = SD_max), position = position_dodge2(), lty =2, size = 0.2)+
@@ -1158,16 +1200,16 @@ PlotS11 <- ggplot(Wildebeest_Ymean, aes(x=Year, y = Infected, fill = LD1))+
         strip.background = element_rect(colour="black",fill="white"))
 
 
-PlotS11 <- PlotS11 + inset_element(p = Wil_pic, left = 0.8, bottom = 0.9, right = 1,  top = 1.1)
+PlotS12 <- PlotS12 + inset_element(p = Wil_pic, left = 0.8, bottom = 0.9, right = 1,  top = 1.1)
 
-tiff("Final_figures/FigureS11.tif",
+tiff("Final_figures/FigureS12.tif",
      compression = "lzw",width=11,height=8,units="cm",res=200)
 
-plot(PlotS11)
+plot(PlotS12)
 dev.off()
 
 
-###### PLOT S12
+###### PLOT S13
 
 Zebra_test <- subset(Zebra_YDR, Prop %in% c('0/0','2/1','3/2','4/4','10/10')) %>% group_by(LD, Year, Prop) %>%
   summarise(Infected = mean(Infection),
@@ -1198,7 +1240,7 @@ Zebra_test$Prop <- factor(Zebra_test$Prop,
                           levels = c('0% / 0%','20% / 10%','30% / 20%','40% / 40%','100% / 100%'))
 
 
-PlotS12a <- ggplot(subset(Zebra_test, LD == 10^5), aes(x=as.factor(Year), y = Infected, fill = Prop))+
+PlotS13a <- ggplot(subset(Zebra_test, LD == 10^5), aes(x=as.factor(Year), y = Infected, fill = Prop))+
   geom_bar(position = position_dodge2(), stat = 'identity')+
   geom_errorbar(data=subset(Zebra_test, LD == 10^5), aes(ymin = SD_min , ymax = SD_max), position = position_dodge2(), size = 0.2)+
   
@@ -1223,7 +1265,7 @@ PlotS12a <- ggplot(subset(Zebra_test, LD == 10^5), aes(x=as.factor(Year), y = In
   guides(fill=guide_legend(nrow=2, byrow=TRUE)) +
   ggtitle(expression('a) LD = 10'^5))
 
-PlotS12b <- ggplot(subset(Zebra_test, LD == 10^6), aes(x=as.factor(Year), y = Infected, fill = Prop))+
+PlotS13b <- ggplot(subset(Zebra_test, LD == 10^6), aes(x=as.factor(Year), y = Infected, fill = Prop))+
   geom_bar(position = position_dodge2(), stat = 'identity')+
   geom_errorbar(data=subset(Zebra_test, LD == 10^6), aes(ymin = SD_min , ymax = SD_max), position = position_dodge2(), size = 0.2)+
   
@@ -1248,7 +1290,7 @@ PlotS12b <- ggplot(subset(Zebra_test, LD == 10^6), aes(x=as.factor(Year), y = In
   guides(fill=guide_legend(nrow=2, byrow=TRUE)) +
   ggtitle(expression('b) LD = 10'^6))
 
-PlotS12c <- ggplot(subset(Zebra_test, LD == 10^7), aes(x=as.factor(Year), y = Infected, fill = Prop))+
+PlotS13c <- ggplot(subset(Zebra_test, LD == 10^7), aes(x=as.factor(Year), y = Infected, fill = Prop))+
   geom_bar(position = position_dodge2(), stat = 'identity')+
   geom_errorbar(data=subset(Zebra_test, LD == 10^7), aes(ymin = SD_min , ymax = SD_max), position = position_dodge2(), size = 0.2)+
   
@@ -1273,7 +1315,7 @@ PlotS12c <- ggplot(subset(Zebra_test, LD == 10^7), aes(x=as.factor(Year), y = In
   guides(fill=guide_legend(nrow=2, byrow=TRUE)) +
   ggtitle(expression('c) LD = 10'^7))
 
-PlotS12d <- ggplot(subset(Zebra_test, LD == 10^8), aes(x=as.factor(Year), y = Infected, fill = Prop))+
+PlotS13d <- ggplot(subset(Zebra_test, LD == 10^8), aes(x=as.factor(Year), y = Infected, fill = Prop))+
   geom_bar(position = position_dodge2(), stat = 'identity')+
   geom_errorbar(data=subset(Zebra_test, LD == 10^8), aes(ymin = SD_min , ymax = SD_max), position = position_dodge2(), size = 0.2)+
   
@@ -1300,19 +1342,19 @@ PlotS12d <- ggplot(subset(Zebra_test, LD == 10^8), aes(x=as.factor(Year), y = In
 
 
 
-PlotS12 <- ggarrange(PlotS12a, PlotS12b, PlotS12c, PlotS12d, common.legend = T, nrow = 2, ncol = 2)
-PlotS12 <- PlotS12 + inset_element(p = Zeb_pic, left = 0.90, bottom = 0.85, right = 0.98,  top = 0.92)
+PlotS13 <- ggarrange(PlotS13a, PlotS13b, PlotS13c, PlotS13d, common.legend = T, nrow = 2, ncol = 2)
+PlotS13 <- PlotS13 + inset_element(p = Zeb_pic, left = 0.90, bottom = 0.85, right = 0.98,  top = 0.92)
 
 
-tiff("Final_figures/FigureS12.tif",
+tiff("Final_figures/FigureS13.tif",
      compression = "lzw",width=18,height=14,units="cm",res=200)
 
-plot(PlotS12)
+plot(PlotS13)
 dev.off()
 
 
 
-###### PLOT S13
+###### PLOT S14
 
 Wildebeest_test <- subset(Wildebeest_YDR, Prop %in% c('0/0','2/1','3/2','4/4','10/10')) %>% group_by(LD, Year, Prop) %>%
   summarise(Infected = mean(Infection),
@@ -1345,7 +1387,7 @@ Wildebeest_test$Prop <- factor(Wildebeest_test$Prop,
                                levels = c('0% / 0%','20% / 10%','30% / 20%','40% / 40%','100% / 100%'))
 
 
-PlotS13a <- ggplot(subset(Wildebeest_test, LD == 10^5), aes(x=as.factor(Year), y = Infected, fill = Prop))+
+PlotS14a <- ggplot(subset(Wildebeest_test, LD == 10^5), aes(x=as.factor(Year), y = Infected, fill = Prop))+
   geom_bar(position = position_dodge2(), stat = 'identity')+
   geom_errorbar(data=subset(Wildebeest_test, LD == 10^5), aes(ymin = SD_min , ymax = SD_max), position = position_dodge2(), size = 0.2)+
   
@@ -1371,7 +1413,7 @@ PlotS13a <- ggplot(subset(Wildebeest_test, LD == 10^5), aes(x=as.factor(Year), y
   ggtitle(expression('a) LD = 10'^5))
 
 
-PlotS13b <- ggplot(subset(Wildebeest_test, LD == 10^6), aes(x=as.factor(Year), y = Infected, fill = Prop))+
+PlotS14b <- ggplot(subset(Wildebeest_test, LD == 10^6), aes(x=as.factor(Year), y = Infected, fill = Prop))+
   geom_bar(position = position_dodge2(), stat = 'identity')+
   geom_errorbar(data=subset(Wildebeest_test, LD == 10^6), aes(ymin = SD_min , ymax = SD_max), position = position_dodge2(), size = 0.2)+
   
@@ -1398,7 +1440,7 @@ PlotS13b <- ggplot(subset(Wildebeest_test, LD == 10^6), aes(x=as.factor(Year), y
 
 
 
-PlotS13c <- ggplot(subset(Wildebeest_test, LD == 10^7), aes(x=as.factor(Year), y = Infected, fill = Prop))+
+PlotS14c <- ggplot(subset(Wildebeest_test, LD == 10^7), aes(x=as.factor(Year), y = Infected, fill = Prop))+
   geom_bar(position = position_dodge2(), stat = 'identity')+
   geom_errorbar(data=subset(Wildebeest_test, LD == 10^7), aes(ymin = SD_min , ymax = SD_max), position = position_dodge2(), size = 0.2)+
   
@@ -1425,7 +1467,7 @@ PlotS13c <- ggplot(subset(Wildebeest_test, LD == 10^7), aes(x=as.factor(Year), y
 
 
 
-PlotS13d <- ggplot(subset(Wildebeest_test, LD == 10^8), aes(x=as.factor(Year), y = Infected, fill = Prop))+
+PlotS14d <- ggplot(subset(Wildebeest_test, LD == 10^8), aes(x=as.factor(Year), y = Infected, fill = Prop))+
   geom_bar(position = position_dodge2(), stat = 'identity')+
   geom_errorbar(data=subset(Wildebeest_test, LD == 10^8), aes(ymin = SD_min , ymax = SD_max), position = position_dodge2(), size = 0.2)+
   
@@ -1451,12 +1493,10 @@ PlotS13d <- ggplot(subset(Wildebeest_test, LD == 10^8), aes(x=as.factor(Year), y
   ggtitle(expression('d) LD = 10'^8))
 
 
-PlotS13 <- ggarrange(PlotS13a, PlotS13b, PlotS13c, PlotS13d, common.legend = T, nrow = 2, ncol = 2)
-PlotS13 <- PlotS13 + inset_element(p = Wil_pic, left = 0.90, bottom = 0.85, right = 0.98,  top = 0.92)
+PlotS14 <- ggarrange(PlotS14a, PlotS14b, PlotS14c, PlotS14d, common.legend = T, nrow = 2, ncol = 2)
+PlotS14 <- PlotS14 + inset_element(p = Wil_pic, left = 0.90, bottom = 0.85, right = 0.98,  top = 0.92)
 
-tiff("Final_figures/FigureS13.tif",
+tiff("Final_figures/FigureS14.tif",
      compression = "lzw",width=18,height=12,units="cm",res=200)
-plot(PlotS13)
+plot(PlotS14)
 dev.off()
-
-
